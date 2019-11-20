@@ -4,7 +4,82 @@ A standard of adding TypeScript type definitions for JavaScript modules.
 
 An alternative to d.ts file.
 
-Work in progress
+How
+---
+In a `t.ts` file you just:
+
+- import untyped symbols and re-export as typed variables
+
+Example:
+
+```ts
+import { caught as _caught } from './caught.js';
+
+export const caught: <T>(promise: Promise<T>) => Promise<T> = _caught;
+```
+
+Then in other code you just import the `.t.ts` file instead of a `.js` file.
+
+Why
+---
+There is no one standard to reference d.ts files that would work for all runtimes:
+
+- [Deno issue #2934: Reconsider the API for declaration files](https://github.com/denoland/deno/issues/2934)
+
+The `t.ts` idea is just using plain TypeScript that is already there with nothing new.
+
+In that sense it is more like JSON than like YAML, i.e. it is doscovered rather than invented.
+
+Tests
+-----
+Let's say that we have an untyped JavaScript module called `caught.js`:
+
+```js
+export const caught = (f => p => (p.catch(f), p))(() => {});
+```
+
+When we import it directly and we use a wrong type of argument:
+```ts
+import { caught } from './caught.js';
+
+caught('wrong argument');
+```
+Then we don't get a compile time error but we get a runtime error:
+```
+error: Uncaught TypeError: p.catch is not a function
+► file:///Users/rsp/deno/git/t.ts/caught.js:1:42
+
+1 export const caught = (f => p => (p.catch(f), p))(() => {});
+                                           ^
+
+    at file:///Users/rsp/deno/git/t.ts/caught.js:1:42
+    at file:///Users/rsp/deno/git/t.ts/test-untyped.ts:3:1
+```
+When we import the `t.ts` file and use a wrong type of argument:
+```ts
+import { caught } from './caught.t.ts';
+
+caught('wrong argument');
+```
+We get a compile time error before running the program:
+```
+error TS2345: Argument of type '"wrong argument"' is not assignable to parameter of type 'Promise<unknown>'.
+
+► file:///Users/rsp/deno/git/t.ts/test-typed.ts:3:8
+
+3 caught('wrong argument');
+         ~~~~~~~~~~~~~~~~
+```
+which is the same effect that you would expect from adding `d.ts` type definitions,
+but with using only plain TypeScript files that can be imported directly.
+
+References
+----------
+
+Examples are based on the `caught` module for Node an Deno:
+
+- https://github.com/rsp/node-caught
+- https://github.com/rsp/deno-caught
 
 Issues
 ------
