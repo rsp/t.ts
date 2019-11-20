@@ -2,7 +2,7 @@ t.ts
 ====
 A standard of adding TypeScript type definitions for JavaScript modules.
 
-An alternative to d.ts file.
+An alternative to d.ts files.
 
 How
 ---
@@ -28,7 +28,7 @@ There is no one standard to reference d.ts files that would work for all runtime
 
 The `t.ts` idea is just using plain TypeScript that is already there with nothing new.
 
-In that sense it is more like JSON than like YAML, i.e. it is doscovered rather than invented.
+In that sense it is more like JSON than like YAML, i.e. it is discovered rather than invented.
 
 Tests
 -----
@@ -72,6 +72,32 @@ error TS2345: Argument of type '"wrong argument"' is not assignable to parameter
 ```
 which is the same effect that you would expect from adding `d.ts` type definitions,
 but with using only plain TypeScript files that can be imported directly.
+
+File names
+----------
+
+For a file `module.js` the `t.ts` type definition cat be named, either:
+
+- `module.t.ts`
+- `module-t.ts`
+
+For Deno it doesnt matter because you import the full file name:
+
+```ts
+import { x } from './module.t.ts';
+import { y } from './module-t.ts';
+```
+
+For environments where you don't include file extensions,
+this might look like a file extension and confude people and IDEs:
+
+```ts
+import { x } from './module.t';
+```
+So this might be used instead:
+```ts
+import { y } from './module-t';
+```
 
 References
 ----------
